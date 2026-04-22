@@ -1,0 +1,28 @@
+---
+title: "Glossary of Terms"
+description: "High-level business terminology used across Dough Dog"
+---
+
+## Algorithm & Assignment
+
+- **Algorithm**: The assignment engine that chooses which product/variant should fulfill a subscription placeholder item.
+- **Algorithm Passes**: The staged selection strategy (for example, prefer new products first, then relax rules) used to find the best available candidate.
+- **Placeholder Item**: A temporary order line that the algorithm later replaces with a concrete product variant during processing.
+
+## Products & Merchandising
+
+- **Assignment Options**: Customer-selectable variant dimensions (such as size or color) that guide which specific variant can be assigned.
+- **Assortment**: A curated group of products used by the subscription system to keep customer picks consistent (for example, by style or print).
+- **Default Product Drop**: The fallback drop used when no regular drop can produce a valid assignment.
+- **Product Drop**: A release configuration that controls which products are eligible for assignment based on rules like date window, theme, and product type.
+- **Product Type**: The subscription-facing category of product (for example, trunks, briefs, socks) used for matching and eligibility.
+- **Related Assortment**: A backup assortment the system can use when the primary assortment does not have a viable product.
+- **Theme**: A merchant-defined category (implemented with Shopify tags) used to group and filter products in subscription logic.
+
+## Subscriptions & Pricing
+
+- **Basic Blueprint**: The core plan template that connects product types, frequencies, and Shopify selling-plan setup.
+- **Blueprint**: A subscription plan configuration that defines what can be sold and how recurring behavior should work.
+- **Frequency**: The recurring interval for billing and/or delivery (for example, every month).
+- **Price Sheet**: A pricing layer that defines subscription and add-on prices by item/frequency, including default and custom pricing scenarios.
+- **Subscription**: An active recurring customer contract that stores plan, frequency, preferences, payment method, and fulfillment context.
