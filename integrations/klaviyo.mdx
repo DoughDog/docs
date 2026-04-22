@@ -1,0 +1,552 @@
+---
+title: "Klaviyo"
+description: "Canonical reference for Klaviyo event payloads emitted by Dough Dog"
+---
+
+This page is the canonical reference for Klaviyo event payloads emitted by Dough Dog.
+
+It reflects what Dough Dog sends in `event.attributes.properties` (the source of truth), not the extra top-level fields Klaviyo adds when events are later queried (`id`, `uniq`, `timestamp`, `data`, `properties`, etc.).
+
+## Metric Names
+
+- `DD Subscription Product Assigned`
+- `DD Subscriber Created`
+- `DD Subscription Canceled`
+- `DD Subscription Order Processed Successfully`
+- `DD Order Retry-able Failure`
+- `DD Item Out of Stock`
+- `DD Subscription Flagged (At Risk)`
+- `DD Subscription Created`
+- `DD Subscriptions Created`
+- `DD Upcoming Order`
+
+## Shared Conventions
+
+- Currency values in `order` and line-item pricing are decimal **strings** (for example, `"16.99"`), not numbers.
+- Subscription frequency uses `{ "count": number, "interval": string }` (not `unit`/`value`).
+- Single-subscription events include `subscription.variants` (array of `{ name, value }`) and may include `assignmentOptions` only for dynamic subscriptions.
+- `subscriptions-created` (plural) uses a different schema than singular subscription events.
+
+## 1) Subscription Product Assigned
+
+Metric: `DD Subscription Product Assigned`
+
+```json
+{
+  "assignedItem": {
+    "itemId": "dd_order_item_uuid"
+  },
+  "order": {
+    "amounts": {
+      "discount": "0.00",
+      "subtotal": "16.99",
+      "total": "23.74"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    },
+    "failurePaymentAttempts": [
+      {
+        "error": "Card declined",
+        "errorCode": "card_declined",
+        "index": 0
+      }
+    ],
+    "lineItems": [],
+    "paymentInfo": "credit_card",
+    "shipping": {
+      "address": {
+        "street1": "123 Test St",
+        "street2": null,
+        "city": "Testville",
+        "stateProvince": "TS",
+        "postalCode": "00000",
+        "country": "US",
+        "name": "Jane Doe",
+        "phone": null
+      },
+      "total": "5.00"
+    }
+  }
+}
+```
+
+## 2) Subscriber Created
+
+Metric: `DD Subscriber Created`
+
+```json
+{
+  "orderLineItem": {
+    "id": "gid://shopify/Product/12345",
+    "name": "Classic Boxer",
+    "imageUrl": "https://cdn.example.com/product.png",
+    "detailUrl": "https://shop.example.com/products/classic-boxer",
+    "productVariantId": "gid://shopify/ProductVariant/123",
+    "variant": "gid://shopify/ProductVariant/123",
+    "sku": "BOXER-XL-001",
+    "quantity": 1,
+    "unitPrice": "16.99",
+    "total": "16.99",
+    "subscription": {
+      "id": "dd_subscription_uuid",
+      "type": "dynamic",
+      "isPrepaid": false,
+      "isMatching": false,
+      "createdAt": "2025-10-31T16:38:29.227Z",
+      "currencyCode": "USD",
+      "plan": "Mens Underwear Monthly",
+      "productType": "Boxer",
+      "theme": "Classic",
+      "shipmentPreference": "different",
+      "frequency": {
+        "count": 1,
+        "interval": "month"
+      },
+      "customer": {
+        "email": "customer@example.com",
+        "firstName": "John",
+        "lastName": "Doe",
+        "phone": null
+      },
+      "assignmentOptions": {
+        "Size": "XL"
+      },
+      "variants": [
+        {
+          "name": "Size",
+          "value": "XL"
+        }
+      ],
+      "subscriptionGroup": null
+    }
+  }
+}
+```
+
+## 3) Subscription Canceled
+
+Metric: `DD Subscription Canceled`
+
+```json
+{
+  "canceledBy": "User",
+  "cancelReason": "Customer requested cancellation",
+  "subscription": {
+    "id": "dd_subscription_uuid",
+    "type": "dynamic",
+    "isPrepaid": false,
+    "isMatching": false,
+    "createdAt": "2025-10-31T16:38:29.227Z",
+    "currencyCode": "USD",
+    "plan": "Mens Underwear Monthly",
+    "productType": "Boxer",
+    "theme": "Classic",
+    "shipmentPreference": "different",
+    "frequency": {
+      "count": 1,
+      "interval": "month"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    },
+    "assignmentOptions": {
+      "Size": "XL"
+    },
+    "variants": [
+      {
+        "name": "Size",
+        "value": "XL"
+      }
+    ],
+    "subscriptionGroup": null
+  }
+}
+```
+
+## 4) Subscription Order Processed Successfully
+
+Metric: `DD Subscription Order Processed Successfully`
+
+```json
+{
+  "order": {
+    "amounts": {
+      "discount": "0.00",
+      "subtotal": "16.99",
+      "total": "23.74"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    },
+    "failurePaymentAttempts": [],
+    "lineItems": [],
+    "paymentInfo": "credit_card",
+    "shipping": {
+      "address": {
+        "street1": "123 Test St",
+        "street2": null,
+        "city": "Testville",
+        "stateProvince": "TS",
+        "postalCode": "00000",
+        "country": "US",
+        "name": "Jane Doe",
+        "phone": null
+      },
+      "total": "5.00"
+    }
+  }
+}
+```
+
+## 5) Order Retry-able Failure
+
+Metric: `DD Order Retry-able Failure`
+
+```json
+{
+  "order": {
+    "amounts": {
+      "discount": "2.00",
+      "subtotal": "25.00",
+      "total": "28.00"
+    },
+    "customer": {
+      "email": "payer@example.com",
+      "firstName": "Paula",
+      "lastName": "Payee",
+      "phone": "+18005550123"
+    },
+    "failurePaymentAttempts": [
+      {
+        "error": "Card declined",
+        "errorCode": "card_declined",
+        "index": 0
+      },
+      {
+        "error": "Processor error",
+        "errorCode": "processor_error",
+        "index": 1
+      }
+    ],
+    "lineItems": [],
+    "paymentInfo": "credit_card",
+    "shipping": {
+      "address": {
+        "street1": "123 Test St",
+        "street2": null,
+        "city": "Testville",
+        "stateProvince": "TS",
+        "postalCode": "00000",
+        "country": "US"
+      },
+      "total": "5.00"
+    }
+  },
+  "paymentUpdateUrl": "https://shop.example.com/services/customer_payment_method/update"
+}
+```
+
+`paymentUpdateUrl` is optional and only present when supplied in outbox message data.
+
+## 6) Order Item Out of Stock
+
+Metric: `DD Item Out of Stock`
+
+```json
+{
+  "outOfStockItem": {
+    "itemId": "dd_order_item_uuid",
+    "variantId": "gid://shopify/ProductVariant/123"
+  },
+  "order": {
+    "amounts": {
+      "discount": "0.00",
+      "subtotal": "16.99",
+      "total": "23.74"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    },
+    "failurePaymentAttempts": [],
+    "lineItems": [],
+    "paymentInfo": "credit_card",
+    "shipping": {
+      "address": {
+        "street1": "123 Test St",
+        "street2": null,
+        "city": "Testville",
+        "stateProvince": "TS",
+        "postalCode": "00000",
+        "country": "US"
+      },
+      "total": "5.00"
+    }
+  }
+}
+```
+
+## 7) Subscription Flagged (At Risk)
+
+Metric: `DD Subscription Flagged (At Risk)`
+
+```json
+{
+  "subscription": {
+    "id": "dd_subscription_uuid",
+    "type": "dynamic",
+    "isPrepaid": false,
+    "isMatching": false,
+    "createdAt": "2025-10-31T16:38:29.227Z",
+    "currencyCode": "USD",
+    "plan": "Mens Underwear Monthly",
+    "productType": "Boxer",
+    "theme": "Classic",
+    "shipmentPreference": "different",
+    "frequency": {
+      "count": 1,
+      "interval": "month"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    },
+    "assignmentOptions": {
+      "Size": "XL"
+    },
+    "variants": [
+      {
+        "name": "Size",
+        "value": "XL"
+      }
+    ],
+    "subscriptionGroup": null
+  }
+}
+```
+
+## 8) Subscription Created (singular)
+
+Metric: `DD Subscription Created`
+
+Payload shape is intentionally the same as **Subscriber Created**:
+
+```json
+{
+  "orderLineItem": {
+    "id": "gid://shopify/Product/12345",
+    "name": "Classic Boxer",
+    "productVariantId": "gid://shopify/ProductVariant/123",
+    "variant": "gid://shopify/ProductVariant/123",
+    "quantity": 1,
+    "unitPrice": "16.99",
+    "total": "16.99",
+    "subscription": {
+      "id": "dd_subscription_uuid",
+      "type": "dynamic",
+      "frequency": {
+        "count": 1,
+        "interval": "month"
+      },
+      "shipmentPreference": "different",
+      "plan": "Mens Underwear Monthly",
+      "theme": "Classic",
+      "productType": "Boxer",
+      "subscriptionGroup": null
+    }
+  }
+}
+```
+
+## 9) Subscriptions Created (plural)
+
+Metric: `DD Subscriptions Created`
+
+This event is the aggregate payload for one checkout/order creating one or more subscriptions.
+
+```json
+{
+  "eventType": "subscriptions-created",
+  "version": 1,
+  "source": "checkout",
+  "occurredAt": "2025-10-31T16:38:29.227Z",
+  "subscriptionCount": 2,
+  "hasDynamicSubscriptions": true,
+  "hasFixedSubscriptions": true,
+  "hasGroupSubscriptions": true,
+  "customer": {
+    "customerId": "gid://shopify/Customer/7559393312828",
+    "email": "jane.doe@example.com",
+    "firstName": "Jane",
+    "lastName": "Doe"
+  },
+  "order": {
+    "id": "dd_order_uuid",
+    "shopifyOrderId": "gid://shopify/Order/10001",
+    "currencyCode": "USD",
+    "total": "22.98",
+    "orderLineItems": [
+      {
+        "shopifyProductId": "gid://shopify/Product/12345",
+        "imageUrl": "https://cdn.shopify.com/s/files/example/product-image.png",
+        "quantity": 1,
+        "unitPrice": "16.99",
+        "sku": "BOXER-XL-001",
+        "productVariantId": "gid://shopify/ProductVariant/123",
+        "name": "Classic Boxer",
+        "total": "16.99",
+        "currencyCode": "USD",
+        "isSubscription": true,
+        "subscriptionId": "dd_subscription_uuid_1"
+      }
+    ]
+  },
+  "subscriptions": [
+    {
+      "id": "dd_subscription_uuid_1",
+      "type": "dynamic",
+      "productType": "Boxer",
+      "assignmentOptions": {
+        "Size": "XL"
+      },
+      "plan": "Boxer of the Month",
+      "theme": "Classic",
+      "shipmentPreference": "different",
+      "isPrepaid": false,
+      "isMatching": false,
+      "createdAt": "2025-10-31T16:38:29.227Z",
+      "frequencyDelivery": {
+        "count": 1,
+        "interval": "month"
+      },
+      "frequencyBilling": {
+        "count": 1,
+        "interval": "month"
+      },
+      "pricing": {
+        "unitPrice": "16.99",
+        "quantity": 1,
+        "total": "16.99",
+        "currencyCode": "USD"
+      },
+      "subscriptionGroup": {
+        "id": "dd_subscriptiongroup_uuid",
+        "assignmentType": "match",
+        "source": "order",
+        "productTypeGroup": {
+          "id": "dd_productTypeGroup_uuid",
+          "name": "Matching Underwear"
+        }
+      }
+    },
+    {
+      "id": "dd_subscription_uuid_2",
+      "type": "fixed",
+      "productType": "Boxer",
+      "plan": "Boxer of the Month",
+      "theme": "Classic",
+      "shipmentPreference": "same",
+      "isPrepaid": false,
+      "isMatching": false,
+      "createdAt": "2025-10-31T16:38:29.227Z",
+      "frequencyDelivery": {
+        "count": 1,
+        "interval": "month"
+      },
+      "frequencyBilling": {
+        "count": 1,
+        "interval": "month"
+      },
+      "pricing": {
+        "unitPrice": "16.99",
+        "quantity": 1,
+        "total": "16.99",
+        "currencyCode": "USD"
+      },
+      "product": {
+        "title": "Classic Boxer"
+      },
+      "variant": {
+        "title": "XL",
+        "price": "16.99"
+      },
+      "subscriptionGroup": null
+    }
+  ]
+}
+```
+
+Important accuracy notes for this event:
+
+- Payload is flat under `properties` (no nested `data` object).
+- `source` is currently emitted as `"checkout"`.
+- `order` is required in current implementation (`orderId` is required to build this event).
+- Group metadata appears under each subscription as `subscriptionGroup` and also drives `hasGroupSubscriptions`.
+
+## 10) Upcoming Order
+
+Metric: `DD Upcoming Order`
+
+```json
+{
+  "order": {
+    "amounts": {
+      "discount": "0.00",
+      "subtotal": "16.99",
+      "total": "23.74"
+    },
+    "customer": {
+      "email": "customer@example.com",
+      "firstName": "John",
+      "lastName": "Doe",
+      "phone": null
+    },
+    "failurePaymentAttempts": [
+      {
+        "error": "Card declined",
+        "errorCode": "card_declined",
+        "index": 0
+      }
+    ],
+    "lineItems": [],
+    "paymentInfo": "credit_card",
+    "shipping": {
+      "address": {
+        "street1": "123 Test St",
+        "street2": null,
+        "city": "Testville",
+        "stateProvince": "TS",
+        "postalCode": "00000",
+        "country": "US",
+        "name": "Jane Doe",
+        "phone": null
+      },
+      "total": "5.00"
+    }
+  }
+}
+```
+
+## Klaviyo Query Output vs Dough Dog Payload
+
+When you fetch events from Klaviyo, you may see:
+
+- top-level fields like `id`, `uniq`, `customer_id`, `timestamp`, `created`
+- both `data` and `properties`
+- an injected `$event_id`
+
+These are Klaviyo-side representations. Dough Dog controls the event metric name, profile email, event time/unique ID, and the `properties` payload documented above.

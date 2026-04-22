@@ -22,6 +22,17 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Integrations",
+        "groups": [
+          {
+            "group": "Marketing",
+            "pages": [
+              "integrations/klaviyo"
+            ]
+          }
+        ]
       }
     ]
   },
