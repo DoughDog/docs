@@ -1,0 +1,143 @@
+---
+title: "Subscription Lifecycle Management"
+description: "High-level guide to how subscriptions move from Shopify purchase to recurring order fulfillment"
+---
+
+## Overview
+
+This guide explains the core subscription lifecycle at a business-process level.
+It focuses on how subscription data flows through Dough Dog from initial Shopify purchase to recurring order creation, algorithm assignment, payment, and fulfillment.
+
+## Lifecycle Stages
+
+### 1) Plan Setup and Publishing
+
+Before customers subscribe, merchants configure subscription plans in Dough Dog:
+
+- Define the subscription structure (plan, frequency, eligible products/product types, themes).
+- Configure merchandising controls such as assortments and product drops.
+- Publish plans so Shopify can present subscription purchase options.
+
+At this point, Shopify is ready to sell the subscription offer.
+
+### 2) Customer Purchase in Shopify
+
+A customer buys a subscription-enabled product in Shopify checkout.
+
+High-level result:
+
+- Shopify records the subscription purchase.
+- Dough Dog receives the relevant subscription/order signals through integration events.
+- Dough Dog maps that data into tenant-aware subscription records.
+
+### 3) Subscription Creation in Dough Dog
+
+Dough Dog creates or updates internal subscription records with the key context needed for recurring operations:
+
+- Customer and shipping address
+- Payment method reference
+- Frequency and plan linkage
+- Product type/theme preferences
+- Assignment options (for example, size)
+
+These subscriptions become the source of truth for recurring order generation.
+
+### 4) Upcoming Order Generation and Grouping
+
+For each upcoming cycle, Dough Dog generates internal recurring orders.
+
+When possible, subscriptions are consolidated into a shared order group to reduce billing and operational overhead. At a high level, grouping depends on matching customer, shipping, payment method, and shipment timing.
+
+This stage creates the operational order shell that will later be finalized for fulfillment.
+
+### 5) Placeholder-Based Assignment Preparation
+
+Recurring orders start with placeholder subscription line items.
+
+Why placeholders exist:
+
+- The final product/variant choice may depend on timing, inventory, and merchandising rules closer to ship date.
+- This keeps order planning flexible while preserving customer and cycle commitments.
+
+### 6) Algorithm Assignment (Product and Variant Selection)
+
+Near processing time, the assignment algorithm resolves each placeholder into a concrete product variant.
+
+It evaluates high-level business constraints such as:
+
+- Product drops (including default fallback behavior)
+- Assortments and related assortments
+- Theme/product-type eligibility
+- Customer assignment options (like size)
+- Inventory availability and assignment strategy passes
+
+Outcome:
+
+- Each eligible placeholder is replaced with an assignable product variant, or surfaced for retry/failure handling when no valid option exists.
+
+### 7) Inventory Reservation and Order Finalization
+
+After successful assignment:
+
+- Inventory is reserved for selected variants.
+- Order totals and line items are finalized.
+- The order is prepared for billing flow.
+
+This is the transition point from "planned recurring order" to "charge-ready order."
+
+### 8) Payment Processing and Shopify Order Alignment
+
+Dough Dog processes payment attempts for finalized recurring orders and keeps Shopify state aligned.
+
+At a high level:
+
+- Grouped subscription orders can produce a combined billing attempt.
+- Payment outcome drives downstream order state transitions.
+- Integration updates keep systems consistent for support and customer visibility.
+
+### 9) Fulfillment and Post-Order Visibility
+
+Once paid, orders move through fulfillment and shipment lifecycle states.
+
+Customers and support teams can then see:
+
+- Upcoming vs past orders
+- Assigned items
+- Shipment status progression
+
+This closes one cycle and sets up the next recurring cycle automatically.
+
+## Ongoing Lifecycle Operations
+
+Subscription lifecycle management is continuous, not one-time.
+Between cycles, customers and admins can update core attributes that affect future runs:
+
+- Frequency changes
+- Theme/product preference updates
+- Address updates
+- Payment method updates
+- Pause, cancel, unpause, or reactivate actions
+
+These changes flow into the next order-generation and assignment cycle.
+
+## Failure and Fallback Model (High-Level)
+
+The lifecycle is designed to degrade gracefully when ideal conditions are not available:
+
+- Assignment falls back from regular drops to default drops where applicable.
+- Related assortments can expand eligible product pools.
+- Queue-based processing and retries support resilience for transient failures.
+- Unresolved issues are surfaced for operational follow-up.
+
+## Summary
+
+At a high level, Dough Dog subscription lifecycle management follows this path:
+
+1. Configure and publish subscription plans
+2. Capture Shopify subscription purchases
+3. Create and maintain internal subscription records
+4. Generate and group recurring orders
+5. Resolve placeholders through algorithm assignment
+6. Reserve inventory and finalize orders
+7. Process payment and sync order state
+8. Fulfill shipment and repeat for the next cycle
