@@ -11,14 +11,14 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Core concepts",
+        "tab": "Platform",
         "groups": [
           {
             "group": "Overview",
             "pages": [
               "index",
-              "core-concepts/glossary",
-              "core-concepts/subscription-lifecycle"
+              "platform/glossary",
+              "platform/subscription-lifecycle"
             ]
           }
         ]
