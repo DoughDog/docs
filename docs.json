@@ -20,6 +20,19 @@
               "platform/glossary",
               "platform/subscription-lifecycle"
             ]
+          },
+          {
+            "group": "Getting Started",
+            "pages": [
+              "getting-started/design-your-program"
+            ]
+          },
+          {
+            "group": "Boxes",
+            "pages": [
+              "platform/boxes/single-item",
+              "platform/boxes/grouped"
+            ]
           }
         ]
       },

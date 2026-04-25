@@ -1,0 +1,60 @@
+---
+title: "Grouped box"
+description: "Subscriptions that ship multiple items together as a single box"
+---
+
+A grouped box ships multiple items together in a single cycle. Customers experience it as one subscription — "my box" — even though the cart and recurring order contain multiple line items.
+
+## When to use it
+
+Use a grouped box when the customer's subscription includes more than one product per shipment. For example:
+
+- A matching set of one bra and one pair of underwear every month
+- Three pairs of socks every three months
+- A bundle of one shampoo and one conditioner every two months
+
+## Cart structure
+
+Grouped boxes do not use a parent product. Each item in the box is its own line in the cart, and each line has its own selling plan. The lines are tied together using two line item properties that Dough Dog uses to recognize them as a single subscription group:
+
+- `_dough_group` — A unique identifier that is the same on every line in the group. This is what tells Dough Dog "these lines are one box." Any value works as long as it is unique across groups; we recommend a UUID.
+- `_dough_assignment` — Either `match` or `different`. This tells the assignment engine how to handle the group in future cycles.
+
+Both properties are required on every line in the group. A new group ID is generated each time a customer adds a box to their cart.
+
+## Assignment modes
+
+The `_dough_assignment` value controls how the assignment engine treats the items in future shipments. It only affects **dynamic** experiences, since fixed boxes always send the same items.
+
+### `match`
+
+Keep the items coordinated across cycles. The assignment engine tries to align attributes — for example, the same color or style — across the lines in the group.
+
+Use `match` when the items are meant to go together as a set. For example, a matching set of one bra and one pair of underwear: the customer expects the two pieces to coordinate.
+
+### `different`
+
+Prefer variety across cycles. The assignment engine tries to vary the items in the group so the customer does not receive duplicates within a shipment.
+
+Use `different` when the box is multiple items of the same product type and variety is the goal. For example, a three-pack of underwear: the customer expects three different styles in the box, not three of the same.
+
+## Examples
+
+### Matching set (one bra + one pair of underwear)
+
+The cart contains two lines, each with its own selling plan. Both lines share the same `_dough_group` value, and both have `_dough_assignment` set to `match`.
+
+| Line | `_dough_group`               | `_dough_assignment` |
+| ---- | ---------------------------- | ------------------- |
+| Bra  | `a3f1...` *(same value)*     | `match`             |
+| Underwear  | `a3f1...` *(same value)*     | `match`             |
+
+### Three-item variety box (three pairs of underwear)
+
+The cart contains three lines, each with its own selling plan. All three share the same `_dough_group` value, and all three have `_dough_assignment` set to `different`.
+
+| Line        | `_dough_group`           | `_dough_assignment` |
+| ----------- | ------------------------ | ------------------- |
+| Underwear 1 | `b7c2...` *(same value)* | `different`         |
+| Underwear 2 | `b7c2...` *(same value)* | `different`         |
+| Underwear 3 | `b7c2...` *(same value)* | `different`         |
