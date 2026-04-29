@@ -1,0 +1,161 @@
+---
+title: "Selling Plans"
+description: "How Dough Dog creates Shopify selling plans and applies them to products"
+---
+
+## Overview
+
+When a Dough Dog subscription plan is published, Dough Dog creates a Shopify **selling plan group** with one selling plan per frequency, then attaches eligible products to that group. Storefront and checkout surface those plans as subscription purchase options.
+
+## Core concepts
+
+- **Subscription plan**: The Dough Dog subscription template for a product or product type.
+- **Plan frequency**: A billing/delivery cadence with a subscription price.
+- **Selling plan group (Shopify)**: The container that holds one or more selling plans.
+- **Selling plan (Shopify)**: The purchasable subscription option (for example, monthly delivery).
+
+## Data mapping
+
+For each published subscription plan, Dough Dog tracks:
+
+- The current Shopify selling plan group ID.
+- The Shopify selling plan ID for each frequency.
+- A history of previous selling plan group IDs from earlier publish cycles.
+
+## Publish flow
+
+1. Validate publish readiness (items, frequencies, type, consistency).
+2. If a previous group exists, delete it from Shopify and archive the ID in history.
+3. Create a new selling plan group, with one selling plan per frequency (billing/delivery interval, fixed price, and metadata linking back to Dough Dog).
+4. Store the new group ID and per-frequency selling plan IDs.
+
+## Product association
+
+After the group is created, Dough Dog syncs product associations:
+
+1. Resolve all products covered by the subscription plan (direct product items and product-type items).
+2. Remove each product from any active selling plan groups (cleanup).
+3. Add the product to the target selling plan group.
+4. Skip products tagged `subscription-ignore`.
+
+This prevents duplicate or conflicting subscription options across plans.
+
+## Ongoing sync
+
+Associations are maintained continuously via queue-based sync, not just at publish time. Products are re-evaluated against active subscription plans, stale associations are removed, and valid associations are reapplied.
+
+## Delivery profile
+
+A selling plan group can be associated with a Shopify delivery profile (for example, a subscription free-shipping profile). Publish completion waits for required delivery profile sync to succeed.
+
+## Unpublish flow
+
+When a subscription plan is unpublished:
+
+1. Delete the Shopify selling plan group.
+2. Clear the active `sellingPlanGroupId`.
+3. Preserve historical IDs in `previousSellingPlanGroupIds`.
+
+Products no longer receive active subscription options from that plan, but historical references remain for audit and legacy contract context.
+
+## Storefront impact
+
+A subscription purchase option appears only when both sides are valid: Dough Dog has a published, synced plan with mapped selling plan IDs, and the Shopify product actually has that selling plan attached.
+
+## Example: how it looks in Shopify
+
+After publish and product sync, the Shopify product carries the selling plan group, which in turn carries one selling plan per frequency. Below is a trimmed example of the GraphQL shape returned for a subscription-eligible product with a single monthly frequency:
+
+```json
+{
+  "node": {
+    "id": "gid://shopify/Product/1234567890",
+    "title": "Monthly Subscription Sock",
+    "handle": "monthly-subscription-sock",
+    "sellingPlanGroups": {
+      "edges": [
+        {
+          "node": {
+            "id": "gid://shopify/SellingPlanGroup/1111111111",
+            "name": "Dough Dog - Monthly Subscription",
+            "merchantCode": "dough-dog-00000000-0000-0000-0000-000000000000",
+            "options": ["Delivery every"],
+            "summary": "1 delivery frequency, $15 discount",
+            "sellingPlans": {
+              "edges": [
+                {
+                  "node": {
+                    "id": "gid://shopify/SellingPlan/2222222222",
+                    "name": "Delivered every 1 month",
+                    "options": ["Delivered every 1 month"],
+                    "position": 1,
+                    "category": "SUBSCRIPTION",
+                    "billingPolicy": {
+                      "interval": "MONTH",
+                      "intervalCount": 1
+                    },
+                    "deliveryPolicy": {
+                      "interval": "MONTH",
+                      "intervalCount": 1,
+                      "preAnchorBehavior": "ASAP",
+                      "intent": "FULFILLMENT_BEGIN"
+                    },
+                    "pricingPolicies": [
+                      {
+                        "adjustmentType": "PRICE",
+                        "adjustmentValue": {
+                          "amount": "14.99",
+                          "currencyCode": "USD"
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+A few things to notice:
+
+- The product references the selling plan group via `sellingPlanGroups`. This is the association created during product sync.
+- `merchantCode` on the group is the stable identifier Dough Dog uses to recognize its own groups in Shopify.
+- Each frequency in the Dough Dog plan becomes one entry in `sellingPlans.edges`. A multi-frequency plan would have multiple selling plans here.
+- `billingPolicy` and `deliveryPolicy` come directly from the plan's frequency (interval and count).
+- `pricingPolicies` reflects the fixed price set by Dough Dog for that frequency.
+
+<Note>
+**Adding a selling plan to the cart**
+
+To add a subscription line to the cart, include `selling_plan` alongside the variant `id` and `quantity` in the Shopify Ajax cart payload. The value is the **numeric** selling plan ID — the trailing number from the GID, not the full `gid://shopify/SellingPlan/...` string.
+
+```js
+fetch('/cart/add.js', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    items: [
+      {
+        id: 1234567890,        // variant ID
+        quantity: 1,
+        selling_plan: 2222222222 // numeric selling plan ID
+      }
+    ]
+  })
+});
+```
+
+For grouped boxes, send one item per line in the same request, each with its own `selling_plan`, and attach the `_dough_group` and `_dough_assignment` line item properties to every line. See [Grouped box](/platform/boxes/grouped) for the full property contract.
+</Note>
+
+## Rules of thumb
+
+- Publishing creates the selling plan structure; syncing applies it to products.
+- One active subscription plan should own subscription eligibility for a given product scope.
+- Associations must stay in sync over time, not just at publish.
+- Unpublish removes active availability but keeps historical references.

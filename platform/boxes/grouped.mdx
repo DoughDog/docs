@@ -58,3 +58,54 @@ The cart contains three lines, each with its own selling plan. All three share t
 | Underwear 1 | `b7c2...` *(same value)* | `different`         |
 | Underwear 2 | `b7c2...` *(same value)* | `different`         |
 | Underwear 3 | `b7c2...` *(same value)* | `different`         |
+
+#### Adding it to the cart
+
+Send all three lines in a single `/cart/add.js` request. Generate one group ID up front (a UUID is recommended) and attach it, along with `_dough_assignment: "different"`, as line item properties on every line. Each line carries its own variant `id` and `selling_plan` (the numeric selling plan ID).
+
+```js
+const groupId = crypto.randomUUID();
+
+fetch('/cart/add.js', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    items: [
+      {
+        id: 1111111111, // underwear variant 1
+        quantity: 1,
+        selling_plan: 2222222222,
+        properties: {
+          _dough_group: groupId,
+          _dough_assignment: 'different'
+        }
+      },
+      {
+        id: 1111111112, // underwear variant 2
+        quantity: 1,
+        selling_plan: 2222222222,
+        properties: {
+          _dough_group: groupId,
+          _dough_assignment: 'different'
+        }
+      },
+      {
+        id: 1111111113, // underwear variant 3
+        quantity: 1,
+        selling_plan: 2222222222,
+        properties: {
+          _dough_group: groupId,
+          _dough_assignment: 'different'
+        }
+      }
+    ]
+  })
+});
+```
+
+A few things to keep in mind:
+
+- The same `groupId` is reused on all three lines — that is what binds them into one box.
+- `_dough_assignment` is set on every line, not just the first. Mixed values within a single group are not supported.
+- Generate a new group ID for each "Add to bag" action so two boxes added back-to-back do not collide.
+- See [Selling plans](/platform/shopify/selling-plans) for how `selling_plan` IDs map back to Dough Dog plan frequencies.

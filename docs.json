@@ -33,6 +33,13 @@
               "platform/boxes/single-item",
               "platform/boxes/grouped"
             ]
+          },
+          {
+            "group": "Shopify",
+            "pages": [
+              "platform/shopify/selling-plans",
+              "platform/shopify/widgets"
+            ]
           }
         ]
       },

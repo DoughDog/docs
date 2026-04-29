@@ -1,0 +1,26 @@
+---
+title: "Theme Widgets"
+description: "Storefront widgets Dough Dog provides for product pages"
+---
+
+Dough Dog ships a set of Shopify storefront widgets that render on the product form. They give customers the controls they need to subscribe and to manage their existing subscription from a product page.
+
+## Subscription purchase options
+
+Renders on the product form as a selling plan selector. The customer chooses between a one-time purchase and any of the available subscription frequencies for the product. Selecting a subscription option attaches the corresponding `selling_plan` to the line that gets added to the cart.
+
+<Frame>
+  <img src="/images/widgets/purchase-options.png" alt="Subscription purchase options widget showing a one-time purchase option and a discounted monthly subscription option" />
+</Frame>
+
+The options shown are driven by the selling plans Dough Dog has attached to the product. See [Selling Plans](/platform/shopify/selling-plans) for how those get created and synced.
+
+## Subscription add to order
+
+Renders a button on the product page that lets an active subscriber add the product to their next upcoming shipment. If a subscriber discount is configured on the plan, the displayed price reflects that discount, and the line is added at the discounted price.
+
+<Frame>
+  <img src="/images/widgets/add-to-order.png" alt="Subscription add to order button showing 'Add To May 19 Subscription Order - $28.80'" />
+</Frame>
+
+This widget also lives on the product form. It only appears for customers who have an upcoming subscription order eligible to receive add-ons.
