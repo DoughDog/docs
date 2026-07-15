@@ -38,7 +38,8 @@
             "group": "Shopify",
             "pages": [
               "platform/shopify/selling-plans",
-              "platform/shopify/widgets"
+              "platform/shopify/widgets",
+              "platform/shopify/subscription-attributes"
             ]
           }
         ]

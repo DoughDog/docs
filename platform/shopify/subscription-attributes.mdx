@@ -1,0 +1,49 @@
+---
+title: "Subscription Attributes"
+description: "Carry cart-entered metadata through checkout onto the subscription"
+---
+
+Sometimes a customer enters a value at the cart that should stick to their subscription — a birthday, or where they subscribed from (product page, mini-cart, a flow). Subscription attributes let that metadata ride a cart line-item property through Shopify checkout and land on the subscription record.
+
+## How it works
+
+Attach a line-item property named `__ddsubattr_<key>` to a subscription line in the cart. During checkout processing, Dough Dog strips the `__ddsubattr_` prefix off any matching property and persists the value on the resulting subscription under an `attributes` map, keyed by `<key>`.
+
+For example, a `__ddsubattr_birthday` property becomes `subscription.attributes.birthday`.
+
+A few things to know:
+
+- **Per line, per subscription.** Attributes are read from the subscription's own line item, so each subscription gets its own values.
+- **Stored as strings.** Everything arrives from Shopify as text and is stored raw. Coerce or validate (dates, numbers) when you read it back.
+- **Inert.** Attributes are kept separate from the options that feed product matching, so nothing here influences which product a customer is assigned.
+- **Prefixed properties only.** Properties without the `__ddsubattr_` prefix are ignored and never written to `attributes`.
+
+## Adding it to the cart
+
+Attach the property alongside the variant `id` and `selling_plan` when you add the subscription line. You can send multiple `__ddsubattr_*` properties on the same line — each becomes its own key under `attributes`.
+
+```js
+fetch('/cart/add.js', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    items: [
+      {
+        id: 1234567890,          // variant ID
+        quantity: 1,
+        selling_plan: 2222222222, // numeric selling plan ID
+        properties: {
+          __ddsubattr_birthday: '1990-04-21',
+          __ddsubattr_source: 'pdp'
+        }
+      }
+    ]
+  })
+});
+```
+
+This checkout results in `subscription.attributes.birthday` and `subscription.attributes.source` being persisted for the new subscription.
+
+<Note>
+Attributes are captured at checkout. Editing them later from the customer portal or by support is not part of this flow.
+</Note>
