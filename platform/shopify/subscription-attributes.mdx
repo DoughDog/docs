@@ -7,17 +7,17 @@ Sometimes a customer enters a value at the cart that should stick to their subsc
 
 ## How it works
 
-Attach a line-item property named `__ddsubattr_<key>` to a subscription line in the cart. During checkout processing, Dough Dog strips the `__ddsubattr_` prefix off any matching property and captures the value on the resulting subscription under `<key>`.
+Attach a line-item property named `__dough_attr_<key>` to a subscription line in the cart. During checkout processing, Dough Dog strips the `__dough_attr_` prefix off any matching property and captures the value on the resulting subscription under `<key>`.
 
 A few things to know:
 
 - **Per line, per subscription.** Attributes are read from the subscription's own line item, so each subscription gets its own values.
 - **Stored as strings.** Everything arrives from Shopify as text and is stored raw.
-- **Prefixed properties only.** Properties without the `__ddsubattr_` prefix are ignored.
+- **Prefixed properties only.** Properties without the `__dough_attr_` prefix are ignored.
 
 ## Adding it to the cart
 
-Attach the property alongside the variant `id` and `selling_plan` when you add the subscription line. You can send multiple `__ddsubattr_*` properties on the same line — each is captured as its own key.
+Attach the property alongside the variant `id` and `selling_plan` when you add the subscription line. You can send multiple `__dough_attr_*` properties on the same line — each is captured as its own key.
 
 ```js
 fetch('/cart/add.js', {
@@ -30,8 +30,8 @@ fetch('/cart/add.js', {
         quantity: 1,
         selling_plan: 2222222222, // numeric selling plan ID
         properties: {
-          __ddsubattr_birthday: '1990-04-21',
-          __ddsubattr_source: 'pdp'
+          __dough_attr_birthday: '1990-04-21',
+          __dough_attr_source: 'pdp'
         }
       }
     ]
