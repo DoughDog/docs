@@ -35,6 +35,18 @@
             ]
           },
           {
+            "group": "Subscriptions",
+            "pages": [
+              "platform/subscriptions/cancel-flows"
+            ]
+          },
+          {
+            "group": "Marketing",
+            "pages": [
+              "platform/marketing/offers"
+            ]
+          },
+          {
             "group": "Shopify",
             "pages": [
               "platform/shopify/selling-plans",

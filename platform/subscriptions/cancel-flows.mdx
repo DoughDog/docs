@@ -1,0 +1,160 @@
+---
+title: "Cancel flows"
+description: "Give customers a reason to stay before they cancel, and learn why they leave"
+---
+
+A cancel flow runs when a customer cancels a subscription in their customer portal. It asks why they're leaving and offers alternatives, such as pausing, skipping, or a discount, before the cancellation goes through.
+
+If you haven't set up a cancel flow, customers see a basic cancel form instead.
+
+## What customers see
+
+1. **Landing screen**: Your message, with a button to return to their account or keep cancelling.
+2. **Reason**: The customer picks why they're cancelling and can add a comment.
+3. **Prompts**: Alternatives to cancelling, such as pausing or changing their frequency.
+4. **Save offers**: A discount or free gift to stay.
+5. **Confirmation**: A final screen before the subscription is cancelled.
+
+The prompts and save offers a customer sees depend on the reason they pick. Customers can pass on them with **No thanks, continue cancelling**. If a reason has no prompts or save offers, those screens are skipped.
+
+## Where to find it
+
+In the Admin, go to **Subscriptions → Cancel Flows**. The page has two tabs:
+
+- **Cancellation Reasons**: The reasons customers choose from, and the prompts and save offers attached to each.
+- **Cancellation Content & Preview**: The text on the landing and confirmation screens, and a preview of the whole flow.
+
+## Statuses
+
+Your cancel flow, and every reason, prompt, and save offer in it, has a status: **Active**, **Draft**, or **Inactive**. Customers only see items that are active.
+
+<Note>
+  Activate the cancel flow itself as well as the reasons, prompts, and offers in it. An active reason inside an inactive flow is never shown.
+</Note>
+
+## 1. Create reasons
+
+On the **Cancellation Reasons** tab, click **Create**.
+
+- **Cancellation Reason Title**: The name your team sees. This is the reason recorded when a customer cancels, including in Klaviyo. Each title must be unique.
+- **Display Title**: What the customer sees, for example "I have too many".
+- **Applies To**: Which subscriptions show this reason. Pick at least one:
+  - **Product Types (Standalone Subscriptions)**: Single-item subscriptions. Choose all product types or specific ones.
+  - **Product Type Groups (Group Subscriptions)**: [Grouped boxes](/platform/boxes/grouped). Choose all groups or specific ones.
+
+  To show a reason for both single-item subscriptions and grouped boxes, check both.
+- **Internal Business Short Code**: Optional code for your own reporting.
+- **Show Required Comment Box** or **Show Optional Comment Box**: Asks the customer for more detail. Turn on one or neither.
+- **Pin to Bottom**: Keeps this reason last in the list. Use it for an "Other" reason. Only one reason can be pinned.
+
+Customers see your reasons in a random order each time, with the pinned reason at the bottom. This keeps the first reason in the list from being picked more often just because it's first.
+
+Each reason can have up to 2 prompts and up to 2 save offers. You add these next.
+
+Click **Save and Activate**, or **Save Draft** to finish later.
+
+## 2. Add prompts
+
+Prompts give the customer a way to fix what's bothering them instead of cancelling. In a reason, under **Cancellation Prompts**, click **Add Prompts**.
+
+- **Prompt to Customer**: The headline, for example "Change your delivery frequency".
+- **Description to customer**: A sentence or two of context.
+- **Internal Short Code**: Optional.
+- **Action**: What the customer can do.
+
+| Action | What the customer can do |
+| --- | --- |
+| **Change Address** | Ship to a different saved address |
+| **Change Frequency** | Switch to every 2 or every 3 months. Choose which options to show. |
+| **Change Theme** | Pick a different theme |
+| **Change Variant** | Change options such as size |
+| **Pause** | Pause for a number of days. Add an option for each length you want to offer, with a button label such as "30 days". |
+| **Skip Next Cycle** | Skip their next shipment and stay subscribed |
+| **Swap Order Item** | Swap an item in their upcoming order |
+
+Prompts only show when the customer can use them. For example, **Change Variant** is hidden when there are no other options to switch to, and **Swap Order Item** is hidden when the customer has no upcoming order.
+
+When a customer changes their variant, theme, or address, they can apply the change to their upcoming order as well.
+
+**Change Address** and **Skip Next Cycle** aren't available for grouped boxes.
+
+## 3. Add save offers
+
+Save offers are your last chance to keep the customer. In a reason, under **Save Offers**, click **Add Offers**.
+
+The **New Save Offer** tab has these fields:
+
+- **Save Offer Title**: The headline the customer sees, for example "Get your next box free".
+- **Offer Short Code For Reporting**: Optional.
+- **Offer Type**: **Discount** or **Free Gift**.
+- **Description to Customer**: Explains the offer. You can use HTML for formatting, such as `<strong>`.
+- **Offer Badge Text**: Optional label shown on the offer, for example "Best value".
+- **Button Text**: The accept button, for example "Accept Offer & Keep Subscription".
+
+### Discount
+
+Choose **Percentage** (1 to 100) or **Fixed Amount**. The discount applies to the customer's next order only, and only to their subscription items, not to add-ons.
+
+### Free gift
+
+Add up to 2 products. For each product, select the variants to offer, or leave them all unselected to offer any variant. The customer picks one product and variant, and it's added to their upcoming order at no charge. Only in-stock variants are shown.
+
+### Attach an offer to a reason
+
+After you save a new offer, the modal returns to the **Existing Save Offers** tab. New offers aren't selected automatically:
+
+1. Check the offer.
+2. Click **Save** in the modal.
+3. Save the reason.
+
+Offers are shared between reasons. You can attach one offer to several reasons, and editing it changes it everywhere it's used.
+
+<Note>
+  A customer can accept one save offer per billing cycle. If they try to cancel again in the same cycle, they can't accept a second offer.
+</Note>
+
+## 4. Write the flow content
+
+On the **Cancellation Content & Preview** tab, set up the screens that open and close the flow. You can use HTML for formatting in the content fields.
+
+**Landing screen**
+
+- **Modal Title**: For example "We value your membership".
+- **Markdown Content**: Your main message.
+- **Return to Account Button Text**: For example "Never mind, take me back".
+- **Warning Content**: Optional text shown between the two buttons, for example what the customer will lose.
+- **Proceed to Cancel Button Text**: For example "I still want to cancel".
+- **Immediate Cancel Button Text**: The label for the immediate cancel button. See below.
+
+**Reasons preview**
+
+Click a reason to preview its prompts and save offers. Use the filters to preview what customers with a specific product type or group see. Click the pencil icon to edit a reason or offer.
+
+**Confirmation screen**
+
+- **Modal Title**: For example "Are you sure?"
+- **Markdown Content**: Optional message.
+- **Keep Subscription Button Text**: For example "Keep my subscription".
+- **Final Cancel Button Text**: For example "Yes, cancel".
+
+Click **Save**, then click **Activate** next to **Status** at the top of the page.
+
+### Immediate cancel
+
+The immediate cancel button lets a customer cancel from any screen and skip the rest of the flow.
+
+**Always show Immediate Cancel option** is on by default. When it's off, the button only shows to customers in California and Colorado, where it's legally required.
+
+## What happens when a customer cancels
+
+- The subscription is cancelled right away, not at the end of the billing period.
+- The subscription is removed from the customer's upcoming orders.
+- The reason and any comment are saved with the cancellation.
+
+For a grouped box, the whole flow applies to the box. Cancelling cancels every subscription in the box, and an accepted save offer applies to each subscription in it. For example, a free gift offer adds one gift for each subscription.
+
+## Tips
+
+- Match prompts to reasons. "I have too many" pairs well with **Change Frequency** or **Skip Next Cycle**. "Size isn't right" pairs well with **Change Variant**.
+- Keep the list short. Five or six clear reasons work better than a long list.
+- Add an "Other" reason, pin it to the bottom, and require a comment. This captures reasons you haven't thought of.

@@ -1,0 +1,99 @@
+---
+title: "Offers"
+description: "Show subscribers discounted products in their customer portal"
+---
+
+Offers put a discounted product in front of your subscribers while they're in their customer portal. When a customer accepts an offer, the item is added to their next upcoming order.
+
+Use offers to raise order value, introduce new products, or reward a specific group of customers.
+
+## Create an offer
+
+In the Admin, go to **Marketing → Offers** and click **Create Offer**. Setup has four steps. You can click **Save Draft** at any point and finish later.
+
+### 1. Details
+
+- **Title (Internal Use)**: A name for your team. Customers never see it.
+- **Start Date** and **End Date**: Optional. The offer only shows between these dates. Leave either blank to keep that side open.
+- **Discount Type**:
+  - **None**: The item is offered at its regular price.
+  - **Fixed Dollar Discount**: Takes a set amount off the item.
+  - **Percentage Discount**: Takes a percentage off the item.
+  - **Free Product**: The item is free.
+- **Offer Accepted Limit (Optional)**: The total number of times the offer can be accepted before it stops showing. Leave blank for unlimited.
+
+### 2. Items
+
+Add up to 10 products. For each product, choose **All variants** or **Specific variants**. Only the variants you select are offered.
+
+### 3. Segmentation
+
+Choose who sees the offer:
+
+- **All Customers**: Everyone sees it.
+- **Use Segment**: Only customers who match your rules see it.
+
+Rules live in groups. In an **AND** group, a customer must match every rule. In an **OR** group, they must match at least one. If you add more than one group, a customer who matches any group sees the offer.
+
+You can have up to 3 groups, with up to 3 rules in each.
+
+| Rule | Matches customers who |
+| --- | --- |
+| **In Klaviyo Segment** | Are in the Klaviyo segment you choose |
+| **Not In Klaviyo Segment** | Are not in the Klaviyo segment you choose |
+| **Subscriber Status** | Are Active, Cancelled, or Yet to Subscribe |
+| **Active Subscription Count** | Have exactly, or at least, 1, 2, or 3 active subscriptions |
+| **Has Subscription (Plan)** | Have an active subscription on the plan you choose |
+| **Has Subscription (Product Type)** | Have an active subscription for the product type you choose |
+| **Purchased Product** | Have bought the product you choose |
+| **Did Not Purchase Product** | Have never bought the product you choose |
+
+Klaviyo rules require your Klaviyo account to be connected.
+
+For example, to target active subscribers who haven't bought your socks yet, create one AND group with **Subscriber Status** set to Active and **Did Not Purchase Product** set to your sock product.
+
+### 4. Design
+
+- **Headline**: Required.
+- **Subheading**: A short description of the offer.
+- **Offer Image**: If you don't upload one, the first product's image is used.
+- **Button Text (Call to Action)**: Required. Defaults to "Accept Offer".
+- **Discount Price Additional Text**: A short note shown with the price, such as "Renews at regular price".
+- **Confirmation Message**: Shown after the customer accepts. Defaults to "Thank you for your purchase!"
+
+The preview beside the form shows how the offer will look. When you're done, click **Save and Activate**.
+
+## Activate an offer
+
+Before you can activate an offer, it needs a title, at least one product, a headline, and button text.
+
+A product can only be in one active offer at a time. If a product is already in another active offer, deactivate that offer first.
+
+## Manage your offers
+
+The **Offers** page lists each offer with its status and results:
+
+- **Viewed**: How many customers have seen the offer.
+- **Accepted**: How many customers have accepted it.
+- **# Available**: The accepted limit, if you set one.
+- **# Remaining**: How many acceptances are left before the offer stops showing.
+
+Drag offers to reorder them. Customers see their eligible offers in this order.
+
+To take an offer down, open it and click **Deactivate**. It returns to Draft, and you can edit and reactivate it later. You can only delete an offer while it's a draft.
+
+## What customers see
+
+A customer sees an offer when all of these are true:
+
+- The offer is active and today is within its dates.
+- The offer hasn't reached its accepted limit.
+- The customer matches its segment.
+- The customer hasn't already accepted it.
+- At least one of its items is in stock.
+
+Out-of-stock variants are hidden. Each customer can accept an offer once, and they need an upcoming order to accept it.
+
+<Note>
+  Changes to who sees an active offer can take up to an hour to reach customers. To apply them right away, deactivate and reactivate the offer.
+</Note>
