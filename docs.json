@@ -66,6 +66,18 @@
             ]
           }
         ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/index",
+              "guides/meta-shop-subscription-plans"
+            ]
+          }
+        ]
       }
     ]
   },
