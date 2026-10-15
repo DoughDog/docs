@@ -41,6 +41,12 @@
             ]
           },
           {
+            "group": "Gifts",
+            "pages": [
+              "platform/gifts"
+            ]
+          },
+          {
             "group": "Marketing",
             "pages": [
               "platform/marketing/offers"

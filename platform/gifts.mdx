@@ -1,0 +1,191 @@
+---
+title: "Gifts"
+description: "Sell a prepaid subscription as a gift, and how Dough Dog delivers it to the recipient"
+---
+
+A gift is a prepaid subscription that one customer buys for someone else. The **gifter** pays for the whole term up front at checkout. The **recipient** gets an email revealing the gift, then receives one box per cycle until the term runs out. Both of them can manage the gift from the customer portal.
+
+## How it works
+
+1. **The merchant enables gifting on a plan.** You turn on gift config for one or more prepaid frequencies of a subscription plan. Each gift-enabled frequency becomes a gift **tier**, with a label (for example "3 months"), a box count and a bundle size.
+2. **Dough Dog publishes a gift product.** Dough Dog creates a separate Shopify product for the plan, tagged `dough: gift-product`. It has one variant per combination of the plan's options, its themes (if any), and a **Term** option with one value per tier. Each variant is priced at the full prepaid amount.
+3. **The gifter buys the gift product.** It's a one-time purchase, not a selling plan. The recipient's details ride along on the cart line as [line-item properties](#line-item-properties).
+4. **Dough Dog captures the gift once the order is paid.** For each unit on a gift line, Dough Dog creates a subscription and a prepaid wallet holding one credit per box in the term. Then it creates a $0 Shopify subscription contract that ships to the recipient.
+5. **The recipient is told about the gift.** The reveal email goes out a few days before the start date, or right away if the gift starts today.
+6. **Boxes ship until the credits run out.** Each shipment uses one credit. The recipient is told when the term is about to end. When the last credit is used, the subscription pauses and both sides are told the term has ended.
+
+<Note>
+A line counts as a gift because its **variant** belongs to a Dough Dog gift product. Buying a regular product on a prepaid selling plan never creates a gift, even if the line carries gift properties.
+</Note>
+
+## Gift states
+
+| State | Meaning |
+| --- | --- |
+| **Draft** | The order was paid, but the recipient's email is missing or invalid. Nothing ships and no reveal is sent until the gifter finishes the details. |
+| **Scheduled** | The gift is complete and waiting. The recipient hasn't been told yet. |
+| **Notified** | The reveal email has gone out. The first box hasn't shipped yet. |
+| **Started** | The first box has shipped or its cycle has begun. |
+| **Cancelled** | The gift was stopped, either by cancellation or because the order was cancelled or refunded. |
+
+A started gift is **depleted** once every credit has been used.
+
+## Complete gifts and drafts
+
+When the order is paid, Dough Dog reads the recipient details off the line and decides what to make:
+
+- **Valid recipient email and a usable address:** a complete gift that ships to the recipient.
+- **Valid recipient email but an unusable address:** still a complete gift, but it ships to the **gifter's checkout address**, and Dough Dog support is alerted so it can follow up. An address is unusable when a required field is missing, or the country or state code is invalid or not one the store ships to.
+- **Missing or invalid recipient email:** a **Draft**. The gifter gets an email with a portal link to finish the recipient's details, and whatever was entered is kept as a prefill. If a draft stays unfinished for 3 days, Dough Dog support is alerted. Nothing is refunded automatically.
+
+<Warning>
+Dough Dog does not check the ZIP code's format. A typo in the ZIP passes straight through to the shipping address. Validate the address on the storefront before the gift reaches the cart.
+</Warning>
+
+## Start date and reveal
+
+- **No start date:** the gift starts today and the reveal goes out right away.
+- **A future date:** the first cycle starts on that date, in the store's timezone. The reveal goes out 3 days before it, at 8 AM store time.
+- **An invalid date** is ignored, and the gift starts today.
+- Dates more than 365 days out are accepted but flagged for review.
+
+## Quantity
+
+Each unit on a gift line becomes its own gift. A line with quantity 3 creates three separate prepaid gifts to the same recipient. If that isn't what you want, hide the quantity selector on the gift product.
+
+## Cancellations and refunds
+
+If the order is cancelled or refunded before a gift has started, Dough Dog cancels that gift automatically. A gift that has already started isn't cancelled; Dough Dog support is alerted to handle it instead. A cancelled or refunded order that hasn't been captured yet never creates a gift.
+
+## Managing a gift in the portal
+
+The gifter and the recipient each see the gift in the customer portal. What each can do depends on the gift's state:
+
+| Action | Gifter | Recipient |
+| --- | --- | --- |
+| Finish a draft | Draft only | — |
+| Edit the gift message and start date | Scheduled only | — |
+| Start the gift now | Scheduled or notified, unless paused | — |
+| Edit recipient email and address, change size, theme or frequency, swap, skip | Any active state | Once notified |
+| Send the next order now | Notified or started | Once notified |
+
+Nothing can be changed once the gift is cancelled or depleted. Edits to the address, recipient email, message and start date are rate limited: 3 changes per field per 24 hours by default.
+
+## Emails
+
+Dough Dog sends these Klaviyo events, so you can build a flow for each one:
+
+| Event | Sent to | When |
+| --- | --- | --- |
+| `DD Gift Notification` | Recipient | The reveal, on the notification date or right away |
+| `DD Gift Details Needed` | Gifter | A paid gift became a Draft |
+| `DD Gift Term Ending` | Recipient | One box is left in the term |
+| `DD Gift Depletion` | Recipient | The last credit has been used |
+| `DD Gift End Of Term` | Gifter and recipient, one event each | The last credit has been used, if the gift was revealed |
+
+Every gift event carries `isGift: true`. Events sent to one side carry `actorScope` (`gifter` or `recipient`), which tells the two End Of Term events apart. Events that link to the portal carry it as `portalUrl`.
+
+## Storefront
+
+### Theme blocks
+
+Dough Dog's theme app extension includes two gift blocks. Each one renders only on a Dough Dog gift product, and only when its surface is enabled in your gift settings.
+
+- **Gift form:** place it in the product details on the gift product page, above the buy buttons. It collects the recipient's details and validates them before add to cart.
+- **Gift landing:** a full gift form for a standalone page. Add it to a page template and pick the gift product in the block settings.
+
+### Line-item properties
+
+The theme blocks are a convenience. Dough Dog reads only the gift product's variant and these line-item properties, so any storefront can sell gifts. That includes custom Liquid, a hand-built product form, or a headless cart.
+
+Each property uses the [subscription attributes](/platform/shopify/subscription-attributes) prefix `__dough_attr_`, so Shopify hides it in the cart and at checkout.
+
+| Property | Required | Format |
+| --- | --- | --- |
+| `__dough_attr_gift` | Yes | `true` |
+| `__dough_attr_gift_recipient_first` | Yes | Text |
+| `__dough_attr_gift_recipient_last` | Yes | Text |
+| `__dough_attr_gift_recipient_email` | Yes | Email address |
+| `__dough_attr_gift_recipient_address1` | Yes | Text |
+| `__dough_attr_gift_recipient_address2` | No | Text |
+| `__dough_attr_gift_recipient_city` | Yes | Text |
+| `__dough_attr_gift_recipient_province` | Yes, for US | Two-letter state code, for example `CA` |
+| `__dough_attr_gift_recipient_zip` | Yes | For US, `12345` or `12345-6789` |
+| `__dough_attr_gift_recipient_country` | Yes | Two-letter country code, for example `US` |
+| `__dough_attr_gift_recipient_phone` | No | Any format; Dough Dog normalises it and falls back to the store's phone if it can't |
+| `__dough_attr_gift_message` | No | Text; the gift form allows up to 500 characters |
+| `__dough_attr_gift_email_subject` | No | Text; the gift form allows up to 150 characters |
+| `__dough_attr_gift_start_date` | No | `YYYY-MM-DD`, after today in the store's timezone |
+
+Dough Dog trims every value. If a property appears twice on a line, the last value wins.
+
+### Custom Liquid example
+
+Add the inputs inside the product form for the gift product, so they submit with the variant:
+
+```liquid
+{% form 'product', product %}
+  <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+  <input type="hidden" name="properties[__dough_attr_gift]" value="true">
+  <input type="hidden" name="properties[__dough_attr_gift_recipient_country]" value="US">
+
+  <input name="properties[__dough_attr_gift_recipient_first]" required>
+  <input name="properties[__dough_attr_gift_recipient_last]" required>
+  <input name="properties[__dough_attr_gift_recipient_email]" type="email" required>
+  <input name="properties[__dough_attr_gift_recipient_address1]" required>
+  <input name="properties[__dough_attr_gift_recipient_address2]">
+  <input name="properties[__dough_attr_gift_recipient_city]" required>
+  <select name="properties[__dough_attr_gift_recipient_province]" required>
+    <option value="">State</option>
+    <option value="AL">Alabama</option>
+    <!-- one option per state -->
+  </select>
+  <input name="properties[__dough_attr_gift_recipient_zip]" required pattern="\d{5}(-\d{4})?">
+  <textarea name="properties[__dough_attr_gift_message]" maxlength="500"></textarea>
+  <input name="properties[__dough_attr_gift_start_date]" type="date">
+
+  <button type="submit">Send this gift</button>
+{% endform %}
+```
+
+Or add the line with the AJAX Cart API:
+
+```js
+fetch('/cart/add.js', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    items: [
+      {
+        id: 1234567890, // gift product variant ID, which also picks the term
+        quantity: 1,
+        properties: {
+          __dough_attr_gift: 'true',
+          __dough_attr_gift_recipient_first: 'Sam',
+          __dough_attr_gift_recipient_last: 'Rivera',
+          __dough_attr_gift_recipient_email: 'sam@example.com',
+          __dough_attr_gift_recipient_address1: '100 Main St',
+          __dough_attr_gift_recipient_city: 'Denver',
+          __dough_attr_gift_recipient_province: 'CO',
+          __dough_attr_gift_recipient_zip: '80202',
+          __dough_attr_gift_recipient_country: 'US',
+          __dough_attr_gift_start_date: '2026-12-20'
+        }
+      }
+    ]
+  })
+});
+```
+
+### Validate before add to cart
+
+Dough Dog's capture is forgiving, so the storefront is where bad data gets stopped. A custom storefront should:
+
+- **Require the email, name and address fields.** A missing email makes a Draft, which fails safe. A missing address field ships the gift to the gifter, which doesn't.
+- **Check the ZIP format and offer states from a list.** Dough Dog doesn't validate the ZIP.
+- **Keep the start date after today.** You can set the date input's `min` to tomorrow for the shopper's benefit, but Dough Dog decides "today" in the store's timezone.
+- **Send nothing until the form is valid.** Partial details on the cart are worse than none. With no gift properties at all, the order becomes a Draft and the gifter is asked to finish it.
+
+<Tip>
+Collection quick-add buttons and cart permalinks add the gift product without any form. Those orders become Drafts. Keep the gift product out of collections that offer quick add.
+</Tip>
