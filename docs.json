@@ -68,7 +68,8 @@
           {
             "group": "Marketing",
             "pages": [
-              "integrations/klaviyo"
+              "integrations/klaviyo",
+              "integrations/postscript"
             ]
           }
         ]

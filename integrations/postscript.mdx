@@ -1,0 +1,193 @@
+---
+title: "Postscript"
+description: "Canonical reference for Postscript SMS events emitted by Dough Dog"
+---
+
+Dough Dog sends subscription lifecycle events to Postscript's Events API (`POST /api/v2/events`). Each event is a trigger you can select in Flow Builder, and each property is a merge tag.
+
+## Setup
+
+1. Go to **Tools > Integrations** and find the **Postscript** card.
+2. Paste your Postscript **private** key (`sk_...`) from your Postscript API settings and click **Connect**. Public keys (`pk_...`) are rejected.
+3. Click **Register Triggers**. This sends one sample of every enabled event so all triggers and merge tags show up in Flow Builder within a couple of minutes.
+
+Sample events carry `doughdog_sample: true` and have no recipient, so they never reach a subscriber.
+
+If Postscript later rejects the stored key, the integration is marked broken and events are skipped until you click **Reconnect** with a current key.
+
+## Event types
+
+| Postscript event | Fires when | Klaviyo equivalent |
+| --- | --- | --- |
+| `subscription_created` | A subscription is created | `DD Subscription Created` |
+| `algorithm_assigned` | A product is assigned to an upcoming order | `DD Subscription Product Assigned` |
+| `charge_upcoming` | An order is coming up | `DD Upcoming Order` |
+| `charge_paid` | A subscription order is paid | `DD Subscription Order Processed Successfully` |
+| `charge_failed` | A payment fails and will be retried | `DD Order Retry-able Failure` |
+| `item_out_of_stock` | An item on an order is out of stock | `DD Item Out of Stock` |
+| `subscription_skipped` | An order is skipped | — |
+| `subscription_cancelled` | A subscription is canceled | `DD Subscription Canceled` |
+| `subscription_reactivated` | A canceled subscription is reactivated | — |
+| `prepaid_renewal_upcoming` | A prepaid term is about to renew | — |
+
+## Shared conventions
+
+- Properties are flat. Postscript can't loop or do math, so every value arrives pre-formatted for a text message.
+- Money is a formatted string with a currency symbol (for example, `"$42.00"`).
+- Dates are long-form strings in UTC (for example, `"October 1, 2026"`).
+- Item lists are a single comma-separated string. Quantities over 1 render as `Name (x2)`.
+- Properties with no value are omitted rather than sent empty, so a merge tag is either populated or absent.
+- Every event includes `customer_first_name` and `portal_url` (the storefront's `/a/subscription/portal`) when available.
+- The recipient is matched by the customer's phone and email.
+- `*_url` quick action links are one-tap links into the portal. A link is omitted when the order isn't eligible for that action.
+- Gift recipients never receive events. Gift events go to the gifter.
+- Each event's `external_id` is the Dough Dog outbox message ID.
+
+## 1) Subscription Created
+
+Event: `subscription_created`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "frequency_text": "every month",
+  "plan_name": "Boxer of the Month",
+  "product_type": "Boxer",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+`frequency_text` reads `every 2 months` when the billing count is greater than 1.
+
+## 2) Algorithm Assigned
+
+Event: `algorithm_assigned`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "item_count": 2,
+  "items_list_formatted": "Classic Boxer, Crew Socks (x2)",
+  "ship_date": "October 1, 2026",
+  "theme_name": "Classic",
+  "swap_url": "https://shop.example.com/a/subscription/quick-actions/...",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+## 3) Charge Upcoming
+
+Event: `charge_upcoming`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "item_count": 2,
+  "items_list_formatted": "Classic Boxer, Crew Socks (x2)",
+  "next_billing_date": "October 1, 2026",
+  "order_total_formatted": "$42.00",
+  "skip_url": "https://shop.example.com/a/subscription/quick-actions/...",
+  "delay_url": "https://shop.example.com/a/subscription/quick-actions/...",
+  "swap_url": "https://shop.example.com/a/subscription/quick-actions/...",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+- Not sent for orders that are fully prepaid, since no charge is coming.
+- Sent again if the order's shipment date moves (delay, Send Later, or reschedule).
+
+## 4) Charge Paid
+
+Event: `charge_paid`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "item_count": 2,
+  "items_list_formatted": "Classic Boxer, Crew Socks (x2)",
+  "order_total_formatted": "$42.00",
+  "ship_date": "October 1, 2026",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+## 5) Charge Failed
+
+Event: `charge_failed`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "order_total_formatted": "$42.00",
+  "payment_method_type": "CREDIT_CARD",
+  "payment_update_url": "https://shop.example.com/services/customer_payment_method/update",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+`payment_update_url` falls back to `portal_url` when no payment update link is available.
+
+## 6) Item Out of Stock
+
+Event: `item_out_of_stock`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "item_name": "Classic Boxer",
+  "ship_date": "October 1, 2026",
+  "swap_url": "https://shop.example.com/a/subscription/quick-actions/...",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+## 7) Subscription Skipped
+
+Event: `subscription_skipped`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "skipped_order_date": "October 1, 2026",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+## 8) Subscription Cancelled
+
+Event: `subscription_cancelled`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "cancelled_date": "October 1, 2026",
+  "plan_name": "Boxer of the Month",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+## 9) Subscription Reactivated
+
+Event: `subscription_reactivated`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "plan_name": "Boxer of the Month",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
+
+## 10) Prepaid Renewal Upcoming
+
+Event: `prepaid_renewal_upcoming`
+
+```json
+{
+  "customer_first_name": "Jane",
+  "plan_name": "Boxer of the Month",
+  "renewal_date": "October 1, 2026",
+  "renewal_total_formatted": "$120.00",
+  "portal_url": "https://shop.example.com/a/subscription/portal"
+}
+```
