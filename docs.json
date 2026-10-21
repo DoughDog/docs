@@ -59,6 +59,12 @@
               "platform/shopify/widgets",
               "platform/shopify/subscription-attributes"
             ]
+          },
+          {
+            "group": "Troubleshooting",
+            "pages": [
+              "platform/troubleshooting/orders-blocked-by-low-inventory"
+            ]
           }
         ]
       },
