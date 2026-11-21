@@ -3,9 +3,27 @@
   "theme": "mint",
   "name": "Dough Dog",
   "colors": {
-    "primary": "#16A34A",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "primary": "#2A7A12",
+    "light": "#73FF06",
+    "dark": "#2A7A12"
+  },
+  "background": {
+    "color": {
+      "light": "#F7F6EF",
+      "dark": "#112030"
+    }
+  },
+  "fonts": {
+    "heading": {
+      "family": "Fraunces",
+      "weight": 700
+    },
+    "body": {
+      "family": "Lexend Deca"
+    }
+  },
+  "appearance": {
+    "default": "light"
   },
   "favicon": "/favicon.svg",
   "navigation": {

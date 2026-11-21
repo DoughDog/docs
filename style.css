@@ -1,0 +1,47 @@
+/* Dough Dog brand layer for Mintlify.
+   Colors, fonts and backgrounds live in docs.json. This file only covers what config can't.
+   Tokens mirror doughdog.co (Dough Dog SEO/redesign/site-head/site.css). */
+
+:root {
+  --dd-lime: #73ff06;
+  --dd-lime-hover: #66e600;
+  --dd-lime-soft: #c8ff9a;
+  --dd-ink: #202420;
+}
+
+/* Admin button: lime pill with ink text, same as the site CTAs */
+#topbar-cta-button a {
+  padding-left: 1rem;
+  padding-right: 0.75rem;
+  font-weight: 600;
+}
+#topbar-cta-button a > span:first-child {
+  background: var(--dd-lime);
+  border-radius: 999px;
+}
+#topbar-cta-button a:hover > span:first-child {
+  background: var(--dd-lime-hover);
+  opacity: 1;
+}
+#topbar-cta-button .text-white,
+#topbar-cta-button svg {
+  color: var(--dd-ink) !important;
+}
+
+/* Fraunces headings get the site's tighter tracking */
+#page-title,
+.mdx-content h2,
+.mdx-content h3 {
+  letter-spacing: -0.02em;
+}
+
+/* Keep small UI labels in the body font, not the display serif */
+[data-layout-item="toc-title"],
+[data-layout-item="toc-title"] * {
+  font-family: "Lexend Deca", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+::selection {
+  background: var(--dd-lime-soft);
+  color: var(--dd-ink);
+}
