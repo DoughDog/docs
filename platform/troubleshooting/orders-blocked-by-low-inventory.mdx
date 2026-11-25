@@ -1,0 +1,30 @@
+---
+title: "Orders blocked by low inventory"
+description: "Why a subscription order fails with insufficient inventory, and how to fix it before it's cancelled"
+---
+
+An order is blocked by low inventory when its billing fails because Shopify has no sellable stock for one of its items at your Primary location. The customer's card isn't the problem. The charge never runs.
+
+## Why it happens
+
+When Dough Dog assigns an item to a subscription order, it reserves the stock. In Shopify, the reservation moves units from your Primary location to the Dough Dog Reserve location. This is a virtual move: nothing moves in your warehouse.
+
+Billing then needs that stock to still be sellable at Primary. If stock leaves Primary after the reservation, billing finds none. Common causes:
+
+- Units pulled for a pop-up event or a wholesale order
+- A cycle count that corrects an over-count
+
+## How to fix it
+
+Fix each blocked order in one of two ways:
+
+- **Restock the variant at Primary.** In Shopify admin, add stock for the short variant at your Primary location. The next billing retry picks it up.
+- **Swap the item.** In the Admin, open **Action items**, then click **Open order** on the blocked order. On the order, use **Swap product** to replace the short item with one you have in stock.
+
+## What happens if you don't
+
+Dough Dog retries billing once a day for 14 days. If the item is still short after the last retry, the order is cancelled as out of stock.
+
+<Note>
+  Each blocked order in **Action items** shows the date it will be cancelled. Fix the orders with the earliest dates first.
+</Note>
